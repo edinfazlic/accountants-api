@@ -5,3 +5,4 @@
 1. Write description how to use it
 1. Create tasks
 1. Deploy it
+1. Share it on social media
