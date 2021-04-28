@@ -1,6 +1,6 @@
 package com.accountant.apiservice.controller;
 
-import com.accountant.apiservice.model.Accountant;
+import com.accountant.apiservice.model.dto.AccountantDto;
 import com.accountant.apiservice.service.AccountantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/accountant")
@@ -27,44 +27,45 @@ public class AccountantController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Accountant>> list(
-      @RequestParam(required = false) Boolean employed
+  public ResponseEntity<Collection<AccountantDto>> list(
+      @RequestParam(required = false) Boolean employed,
+      @RequestParam(required = false) String name
   ) {
-    List<Accountant> accountants = service.getList(employed);
+    Collection<AccountantDto> accountants = service.getList(employed, name);
 
     return ResponseEntity.status(HttpStatus.OK).body(accountants);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Accountant> get(
+  public ResponseEntity<AccountantDto> get(
       @PathVariable Long id
   ) {
-    Accountant accountant = service.get(id);
+    AccountantDto accountant = service.get(id);
 
     return ResponseEntity.status(HttpStatus.OK).body(accountant);
   }
 
   @PostMapping
-  public ResponseEntity<Accountant> save(
-      @RequestBody Accountant accountant
+  public ResponseEntity<AccountantDto> save(
+      @RequestBody AccountantDto accountant
   ) {
-    Accountant result = service.save(accountant);
+    AccountantDto result = service.save(accountant);
 
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Accountant> update(
+  public ResponseEntity<AccountantDto> update(
       @PathVariable Long id,
-      @RequestBody Accountant accountant
+      @RequestBody AccountantDto accountant
   ) {
-    Accountant result = service.update(id, accountant);
+    AccountantDto result = service.update(id, accountant);
 
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Accountant> update(
+  public ResponseEntity<AccountantDto> update(
       @PathVariable Long id
   ) {
     service.delete(id);
@@ -72,13 +73,3 @@ public class AccountantController {
     return ResponseEntity.noContent().build();
   }
 }
-
-/*
-
-Read      GET
-Create    POST
-
-Update    PUT
-Delete    DELETE
-
-*/

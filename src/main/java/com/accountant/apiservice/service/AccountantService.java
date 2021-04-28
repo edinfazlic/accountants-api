@@ -1,79 +1,67 @@
 package com.accountant.apiservice.service;
 
-import com.accountant.apiservice.model.Accountant;
+import com.accountant.apiservice.model.dto.AccountantDto;
+import com.accountant.apiservice.model.entities.Accountant;
+import com.accountant.apiservice.repository.AccountantRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AccountantService {
 
-  private ArrayList<Accountant> accountants = new ArrayList<>();
+  private final AccountantRepository accountantRepository;
 
-  public AccountantService() {
-    accountants.add(new Accountant(0L, "Mike", true));
-    accountants.add(new Accountant(1L, "Jane", true));
-    accountants.add(new Accountant(2L, "Bob", false));
-    accountants.add(new Accountant(3L, "Lara", false));
-  }
-
-  public List<Accountant> getList(Boolean employed) {
-    return this.accountants.stream()
-        .filter(accountant -> employed == null ||  employed == accountant.getEmployed())
+  public Collection<AccountantDto> getList(Boolean employed, String name) {
+    // todo: proper filtering
+    return accountantRepository.findByActive(employed).stream()
+        .map(this::toPayload)
         .collect(Collectors.toList());
   }
 
-  public Accountant get(Long id) {
-    if (id == null) {
-      return null;
+  public AccountantDto get(Long id) {
+    Optional<Accountant> accountantOptional = accountantRepository.findById(id);
+    if (accountantOptional.isPresent()) {
+      return toPayload(accountantOptional.get());
     }
-    for (Accountant accountant : accountants) {
-      if (id.equals(accountant.getId())) {
-        return accountant;
-      }
-    }
-
-    return null;
+    throw new RuntimeException("Accountant with id:" + id + " doesn't exist!");
   }
 
-  public Accountant save(Accountant accountant) {
-    accountants.add(accountant);
-    return accountant;
+  public AccountantDto save(AccountantDto payload) {
+    Accountant accountant = fromPayload(payload);
+    accountant = accountantRepository.save(accountant);
+    return toPayload(accountant);
   }
 
-  public Accountant update(Long id, Accountant accountant) {
-    if (id == null) {
-      return null;
-    }
+  public AccountantDto update(Long id, AccountantDto payload) {
+    get(id);
 
-    for (Accountant existingAccountant : accountants) {
-      if (id.equals(existingAccountant.getId())) {
-        existingAccountant.setId(accountant.getId());
-        existingAccountant.setName(accountant.getName());
-        return existingAccountant;
-      }
-    }
-
-    return null;
+    Accountant accountant = fromPayload(payload);
+    accountant.setId(id);
+    accountant = accountantRepository.save(accountant);
+    return toPayload(accountant);
   }
 
   public void delete(Long id) {
-    if (id == null) {
-      return;
-    }
+    accountantRepository.deleteById(id);
+  }
 
-    // todo: complete this method
+  private Accountant fromPayload(AccountantDto payload) {
+    Accountant accountant = new Accountant();
+    accountant.setActive(payload.getEmployed());
+    accountant.setName(payload.getName());
+    return accountant;
+  }
 
-//    for (Accountant existingAccountant : accountants) {
-//      if (id.equals(existingAccountant.getId())) {
-//        existingAccountant.setId(accountant.getId());
-//        existingAccountant.setName(accountant.getName());
-//        return existingAccountant;
-//      }
-//    }
-//
-//    return null;
+  private AccountantDto toPayload(Accountant accountant) {
+    AccountantDto payload = new AccountantDto();
+    payload.setEmployed(accountant.isActive());
+    payload.setName(accountant.getName());
+    payload.setId(accountant.getId());
+    return payload;
   }
 }

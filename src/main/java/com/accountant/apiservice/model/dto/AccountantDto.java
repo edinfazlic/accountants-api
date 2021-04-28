@@ -1,4 +1,4 @@
-package com.accountant.apiservice.model;
+package com.accountant.apiservice.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Accountant {
+public class AccountantDto {
 
   private Long id;
   private String name;
