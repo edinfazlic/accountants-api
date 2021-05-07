@@ -18,7 +18,7 @@ public class AccountantService {
 
   public Collection<AccountantDto> getList(Boolean employed, String name) {
     // todo: proper filtering
-    return accountantRepository.findByActive(employed).stream()
+    return accountantRepository.findAll().stream()
         .map(this::toPayload)
         .collect(Collectors.toList());
   }
